@@ -1,0 +1,7 @@
+services:
+  redka:
+    image: nalgeon/redka
+    volumes:
+      - ./data:/data:rw
+    entrypoint: redka -h localhost -p 6379 /data/redka.db
+    network_mode: host

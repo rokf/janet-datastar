@@ -10,6 +10,8 @@
 
 (declare-source
   :prefix "datastar"
-  :source ["src/attributes.janet"
+  :source ["src/init.janet"
+           "src/attributes.janet"
            "src/actions.janet"
-           "src/events.janet"])
+           "src/events.janet"
+           "src/server.janet"])
