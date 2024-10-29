@@ -34,12 +34,12 @@
       [:main
        ;content]]]))
 
-(defn- item-card [src name description price]
-  [:article
+(defn- item-card [id src name description price stock]
+  [:article {:id id}
    [:div {:class "grid"}
     [:img {:src src :height "200" :width "200"}]
     [:div
-     [:hgroup [:h4 name] [:p description]]
+     [:hgroup [:h4 {:data-tooltip (string/format "%s left in stock." stock)} name (string/format " (%s)" stock)] [:p description]]
      [:p [:strong (string "$" price)]]
      [:fieldset {:role "group"}
       [:input {:type "number" :value 1 :min 1}]
@@ -93,14 +93,18 @@
   (default search "")
   (def items @[])
   (each id (redka/keys db (string/format "items:%s*" search)) (do
-                                                                (pp id)
                                                                 (def item (table ;(redka/hgetall db id)))
                                                                 (array/push items (item-card
+                                                                                    id
                                                                                     (get item "image")
                                                                                     (get item "name")
                                                                                     (get item "description")
-                                                                                    (get item "price")))))
-  (map (fn [p] [:div {:class "grid"} ;p]) (make-pairs [] items)))
+                                                                                    (get item "price")
+                                                                                    (get item "stock")))))
+  (do
+    (def results (map (fn [p] [:div {:class "grid"} ;p]) (make-pairs [] items)))
+    (pp (length results))
+    results))
 
 (defn- index-page [req]
   {:status 200
@@ -132,8 +136,9 @@
   (if (= "" (get-in req [:datastar :search] ""))
     (do (array/push events
                     (events/fragment (htmlgen/html default-header) :selector "#item-header-group" :merge :outer)
-                    (events/fragment (htmlgen/html (item-list)) :selector "#results" :merge :inner)))
+                    (events/fragment (htmlgen/html [:div {:id :results} ;(item-list)]) :selector "#results" :merge :outer)))
     (do
+      (pp (get-in req [:datastar :search]))
       (def items (item-list (get-in req [:datastar :search])))
       (if (empty? items)
         (array/push events
@@ -141,7 +146,7 @@
                     (events/fragment (htmlgen/html [:div]) :selector "#results" :merge :inner))
         (array/push events
                     (events/fragment (htmlgen/html result-header) :selector "#item-header-group" :merge :outer)
-                    (events/fragment (htmlgen/html items) :selector "#results" :merge :inner)))))
+                    (events/fragment (htmlgen/html [:div {:id :results} ;items]) :selector "#results" :merge :outer)))))
   {:headers datastar/headers
    :body events})
 
