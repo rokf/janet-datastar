@@ -22,12 +22,16 @@
       [:link {:rel "stylesheet" :href "https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"}]
       [:script {:type "module" :src "https://cdn.jsdelivr.net/npm/@sudodevnull/datastar@0.19.9/dist/datastar.min.js"}]
       [:title "office.shop"]]
-     [:body (struct :class "container" ;(attributes/store {:search ""}))
+     [:body (struct :class "container" ;(attributes/store {:search ""} :local :ifmissing))
       [:header
        [:nav
         [:ul [:li [:a {:href "/"} [:strong "office.shop"]]]]
         [:ul [:li [:input
-                   (struct :type "search" :placeholder "I'm looking for..." ;(attributes/model :search) ;(attributes/on :input (actions/post "/items") "debounce_500ms"))]]]
+                   (struct
+                     :type "search"
+                     :placeholder "I'm looking for..."
+                     ;(attributes/model :search)
+                     ;(attributes/on :input (actions/post "/items") "debounce_500ms"))]]]
         [:ul
          [:li [:a {:href "/about"} "About"]]
          [:li [:a {:href "/cart"} "Cart (0)"]]]]]
@@ -103,12 +107,13 @@
                                                                                     (get item "stock")))))
   (do
     (def results (map (fn [p] [:div {:class "grid"} ;p]) (make-pairs [] items)))
-    (pp (length results))
     results))
 
 (defn- index-page [req]
   {:status 200
-   :body (layout default-header [:div {:id :results} ;(item-list)])
+   :body (layout default-header [:div (struct
+                                        :id :results
+                                        ;(attributes/on :load (actions/post "/items")))])
    :headers {:content-type "text/html"}})
 
 (defn- about-page [req]
@@ -133,20 +138,20 @@
 
 (defn- item-search [req]
   (def events @[])
-  (if (= "" (get-in req [:datastar :search] ""))
-    (do (array/push events
-                    (events/fragment (htmlgen/html default-header) :selector "#item-header-group" :merge :outer)
-                    (events/fragment (htmlgen/html [:div {:id :results} ;(item-list)]) :selector "#results" :merge :outer)))
-    (do
-      (pp (get-in req [:datastar :search]))
-      (def items (item-list (get-in req [:datastar :search])))
-      (if (empty? items)
-        (array/push events
-                    (events/fragment (htmlgen/html no-result-header) :selector "#item-header-group" :merge :outer)
-                    (events/fragment (htmlgen/html [:div]) :selector "#results" :merge :inner))
-        (array/push events
-                    (events/fragment (htmlgen/html result-header) :selector "#item-header-group" :merge :outer)
-                    (events/fragment (htmlgen/html [:div {:id :results} ;items]) :selector "#results" :merge :outer)))))
+  (if (not (string/has-suffix? "/" (get-in req [:headers "referer"]))) (array/push events (events/redirect "/"))
+    (if (= "" (get-in req [:datastar :search] ""))
+      (do (array/push events
+                      (events/fragment (htmlgen/html default-header) :selector "#item-header-group" :merge :outer)
+                      (events/fragment (htmlgen/html [:div {:id :results} ;(item-list)]) :selector "#results" :merge :outer)))
+      (do
+        (def items (item-list (get-in req [:datastar :search])))
+        (if (empty? items)
+          (array/push events
+                      (events/fragment (htmlgen/html no-result-header) :selector "#item-header-group" :merge :outer)
+                      (events/fragment (htmlgen/html [:div]) :selector "#results" :merge :inner))
+          (array/push events
+                      (events/fragment (htmlgen/html result-header) :selector "#item-header-group" :merge :outer)
+                      (events/fragment (htmlgen/html [:div {:id :results} ;items]) :selector "#results" :merge :outer))))))
   {:headers datastar/headers
    :body events})
 
