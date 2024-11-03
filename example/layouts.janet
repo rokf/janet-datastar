@@ -12,7 +12,7 @@
       [:link {:rel "stylesheet" :href "https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"}]
       [:script {:type "module" :src "https://cdn.jsdelivr.net/npm/@sudodevnull/datastar@0.19.9/dist/datastar.min.js"}]
       [:title "office.shop"]]
-     [:body (struct :class "container" ;(attributes/store {:search ""} :local :ifmissing))
+     [:body (struct :class "container" ;(attributes/store {:search ""}))
       [:header
        [:nav
         [:ul [:li [:a {:href "/"} [:strong "office.shop"]]]]

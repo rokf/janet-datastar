@@ -5,23 +5,37 @@
 (import ../src :as datastar)
 
 (defn item-search [req redka-client]
+  (def referer-header (get-in req [:headers "referer"]))
+  (def search-term (get-in req [:datastar :search] ""))
+  (def items (db/items redka-client search-term))
   (def events @[])
-  (if (not (string/has-suffix? "/" (get-in req [:headers "referer"]))) (array/push events (events/redirect "/"))
-    (if (= "" (get-in req [:datastar :search] ""))
+  (if (not (string/has-suffix? "/" referer-header)) (array/push events (events/redirect "/"))
+    (if (= "" search-term)
       (do (array/push events
                       (events/fragment
                         (htmlgen/html components/default-header) :selector "#item-header-group" :merge :outer)
                       (events/fragment
-                        (htmlgen/html [:div {:id :results} ;(components/item-list (db/items redka-client nil))]) :selector "#results" :merge :outer)))
+                        (htmlgen/html [:div {:id :results} ;(components/item-list items)]) :selector "#results" :merge :outer)))
       (do
-        (def items (components/item-list (db/items redka-client (get-in req [:datastar :search]))))
         (if (empty? items)
           (array/push events
-                      (events/fragment (htmlgen/html components/no-result-header) :selector "#item-header-group" :merge :outer)
-                      (events/fragment (htmlgen/html [:div]) :selector "#results" :merge :inner))
+                      (events/fragment
+                        (htmlgen/html components/no-result-header)
+                        :selector "#item-header-group"
+                        :merge :outer)
+                      (events/fragment
+                        (htmlgen/html [:div])
+                        :selector "#results"
+                        :merge :inner))
           (array/push events
-                      (events/fragment (htmlgen/html components/result-header) :selector "#item-header-group" :merge :outer)
-                      (events/fragment (htmlgen/html [:div {:id :results} ;items]) :selector "#results" :merge :outer))))))
+                      (events/fragment
+                        (htmlgen/html components/result-header)
+                        :selector "#item-header-group"
+                        :merge :outer)
+                      (events/fragment
+                        (htmlgen/html [:div {:id :results} ;(components/item-list items)])
+                        :selector "#results"
+                        :merge :outer))))))
   {:headers datastar/headers
    :body events})
 

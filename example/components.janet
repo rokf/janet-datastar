@@ -10,6 +10,7 @@
 (def default-header (make-header "Items" "These are the items we're selling."))
 (def result-header (make-header "Results" "Were you perhaps looking for one of these items?"))
 (def no-result-header (make-header "No results" "No results found."))
+(def cart-header (make-header "Cart" "You have the following items in your cart."))
 
 (defn item-card [item]
   [:article {:id (item :id)}
@@ -32,3 +33,6 @@
 
 (defn item-list [items]
   (map (fn [x] [:div {:class "grid"} ;x]) (make-pairs [] (map item-card items))))
+
+(defn cart-table []
+  [:article [:table [:thead [:tr [:th "Item"] [:th "Quantity"] [:th "Actions"]]] [:tbody]]])

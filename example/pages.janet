@@ -7,7 +7,7 @@
   {:status 200 :body (layouts/default [:h1 "About"] [:p "This is a store example built around Datastar."])})
 
 (defn cart [req]
-  {:status 200 :body (layouts/default [:h1 "Cart"])})
+  {:status 200 :body (layouts/default components/cart-header (components/cart-table))})
 
 (defn index [req]
   {:status 200
