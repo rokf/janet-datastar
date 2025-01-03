@@ -20,7 +20,7 @@
       ["data-on-click__window__debounce.1s"
        "$$fn('foo', 123)"])
 
-(test (attributes/persist) ["data-persist-datastar" :true])
+(test (attributes/persist) ["data-persist-datastar" ""])
 
 (test (attributes/replace-url "/hello/world") ["data-replace-url" "/hello/world"])
 
@@ -45,9 +45,9 @@
        "console.log('Hi')"])
 
 (test (attributes/scroll-into-view :instant :focus)
-      ["data-scroll-into-view__instant__focus"
-       :true])
+  ["data-scroll-into-view__instant__focus"
+   ""])
 
 (test (attributes/view-transition :foo) ["data-view-transition" :foo])
 
-(test (attributes/ignore) [:data-star-ignore :true])
+(test (attributes/ignore) [:data-star-ignore ""])

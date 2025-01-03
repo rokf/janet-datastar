@@ -4,7 +4,10 @@
 (import ../src/actions)
 
 (defn about [req]
-  {:status 200 :body (layouts/default [:h1 "About"] [:p "This is a store example built around Datastar."])})
+  {:status 200 :body (layouts/default
+                       [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"]
+                       [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"] [:h1 "About"]
+                       [:h1 "About"] [:p (struct ;(attributes/scroll-into-view)) "This is a store example built around Datastar."])})
 
 (defn cart [req]
   {:status 200 :body (layouts/default components/cart-header (components/cart-table))})

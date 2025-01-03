@@ -42,7 +42,7 @@
 
 (defn persist [&opt key val & modifiers]
   (default key "datastar")
-  (default val :true)
+  (default val "")
   [(string/join [(string "data-persist-" key) ;(map encode-modifier modifiers)] "__") val])
 
 (defn replace-url [expr]
@@ -59,9 +59,8 @@
 (defn intersects [expr & modifiers]
   [(string/join [:data-intersects ;(map encode-modifier modifiers)] "__") expr])
 
-# @TODO will :true work for boolean attributes?
 (defn scroll-into-view [& modifiers]
-  [(string/join ["data-scroll-into-view" ;(map encode-modifier modifiers)] "__") :true])
+  [(string/join ["data-scroll-into-view" ;(map encode-modifier modifiers)] "__") ""])
 
 (defn show [expr]
   ["data-show" expr])
@@ -77,4 +76,4 @@
 # IGNORING ELEMENTS
 
 (defn ignore []
-  [:data-star-ignore :true])
+  [:data-star-ignore ""])
