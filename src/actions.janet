@@ -1,6 +1,21 @@
+(import spork/json)
+
+# HELPERS
+
+(defn- encode-obj [obj]
+  (case (type obj)
+    :struct (string (json/encode obj))
+    :table (string (json/encode obj))
+    :string obj
+    "{}"))
+
+
+# BACKEND PLUGINS
+
 (defmacro- make-request-action [method]
-  ~(def ,method (fn [& args]
-                  (string/format "$$%s('%s')" ',method (string/join args "/")))))
+  ~(def ,method (fn [url &opt options]
+                  (default options {})
+                  (string/format "@%s('%s', %s)" ',method url (encode-obj options)))))
 
 (make-request-action get)
 
@@ -12,26 +27,15 @@
 
 (make-request-action delete)
 
-(defn is-fetching [css-selector]
-  (string/format "$$isFetching('%s')" css-selector))
+# LOGIC PLUGINS
 
 (defn set-all [regexp val]
-  (string/format "$$setAll('%s', %s)" regexp val))
+  (string/format "@setAll('%s', %s)" regexp val))
 
 (defn toggle-all [regexp]
-  (string/format "$$toggleAll('%s')" regexp))
+  (string/format "@toggleAll('%s')" regexp))
 
-(defn clipboard [txt]
-  (string/format "$$clipboard('%s')" txt))
-
-(defn fit [v old-min old-max new-min new-max]
-  (string/format "$$fit(%d, %d, %d, %d, %d)" v old-min old-max new-min new-max))
-
-(defn fit-int [v old-min old-max new-min new-max]
-  (string/format "$$fitInt(%d, %d, %d, %d, %d)" v old-min old-max new-min new-max))
-
-(defn clamp-fit [v old-min old-max new-min new-max]
-  (string/format "$$clampFit(%d, %d, %d, %d, %d)" v old-min old-max new-min new-max))
-
-(defn clamp-fit-int [v old-min old-max new-min new-max]
-  (string/format "$$clampFitInt(%d, %d, %d, %d, %d)" v old-min old-max new-min new-max))
+(defn fit [v old-min old-max new-min new-max &opt should-clamp should-round]
+  (default should-clamp false)
+  (default should-round false)
+  (string/format "@fit(%d, %d, %d, %d, %d, %V, %V)" v old-min old-max new-min new-max should-clamp should-round))

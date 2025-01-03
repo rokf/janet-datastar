@@ -1,34 +1,47 @@
 (import spork/json)
 
-(defn fragment [html &keys options]
+# HELPERS
+
+(defn- encode-obj [obj]
+  (case (type obj)
+    :struct (string (json/encode obj))
+    :table (string (json/encode obj))
+    :string obj
+    "{}"))
+
+# EVENT TYPES
+
+(defn merge-fragments [html &keys options]
   (def lines @[])
-  (array/push lines "event: datastar-fragment")
+  (array/push lines "event: datastar-merge-fragments")
   (eachp [k v] options (do
                          (array/push lines (string/format "data: %s %s" k v))))
-  (array/push lines (string/format "data: fragment %s" html))
+  # @TODO add support for multiple fragment lines
+  (array/push lines (string/format "data: fragments %s" html))
   (string (string/join lines "\n") "\n\n"))
 
-(defn signal [ifmissing store]
-  (def lines ["event: datastar-signal"
-              (string/format "data: ifmissing %s" ifmissing)
-              (string/format "data: store %s" (string (json/encode store)))])
+(defn merge-signals [signals &opt if-missing]
+  (default if-missing false)
+  (def lines ["event: datastar-merge-signals"
+              (string/format "data: onlyIfMissing %V" if-missing)
+              (string/format "data: signals %s" (encode-obj signals))])
   (string (string/join lines "\n") "\n\n"))
 
-(defn delete [input]
-  (def lines @["event: datastar-delete"])
-  (array/push lines (case (type input)
-                      :array (string/format "data: paths %s" (string/join (map string input) " "))
-                      :tuple (string/format "data: paths %s" (string/join (map string input) " "))
-                      :string (string/format "data: selector %s" input)
-                      :keyword (string/format "data: selector %s" input)))
+(defn remove-fragments [selector]
+  (def lines @["event: datastar-remove-fragments"])
+  (array/push lines (string/format "data: selector %s" selector))
   (string (string/join lines "\n") "\n\n"))
 
-(defn redirect [url]
-  (def lines ["event: datastar-redirect"
-              (string/format "data: url %s" url)])
+(defn remove-signals [paths]
+  (def lines @["event: datastar-remove-signals"])
+  (each p paths (array/push lines (string/format "data: paths %s" p)))
   (string (string/join lines "\n") "\n\n"))
 
-(defn console [mode msg]
-  (def lines ["event: datastar-console"
-              (string/format "data: %s %s" mode msg)])
+(defn execute-script [attributes script-lines &opt auto-remove]
+  (default auto-remove false)
+  (def lines @["event: datastar-execute-script"
+               (string/format "data: autoRemove %V" auto-remove)])
+  (eachp [k v] attributes
+    (array/push lines (string/format "data: attributes %s %V" k v)))
+  (each l script-lines (array/push lines (string/format "data: script %s" l)))
   (string (string/join lines "\n") "\n\n"))

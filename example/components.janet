@@ -22,7 +22,7 @@
      [:fieldset {:role "group"}
       [:input {:type "number" :value 1 :min 1 :max (item :stock)}]
       [:button
-       (struct ;(attributes/on :click (actions/post "/items" "1" "add-to-cart")))
+       (struct ;(attributes/on :click (actions/post (string "/items" "1" "add-to-cart"))))
        "Add"]]]]])
 
 (defn- make-pairs [acc items]

@@ -2,42 +2,52 @@
 
 (import ../src/attributes)
 
-(test (attributes/store {:foo 1234} :local) ["data-store.local" "{\"foo\":1234}"])
-
 (test (attributes/computed :blinker "$count % 2 === 0")
       ["data-computed-blinker"
        "$count % 2 === 0"])
 
 (test (attributes/ref "foo") [:data-ref "foo"])
 
-(test (attributes/bind :disabled "$shouldBeDisabled")
-      ["data-bind-disabled"
-       "$shouldBeDisabled"])
-
-(test (attributes/model "foo") ["data-model" "foo"])
+(test (attributes/bind "foo") ["data-bind" "foo"])
 
 (test (attributes/text "$foo") ["data-text" "$foo"])
 
-(test (attributes/on :click "$$fn('foo', 123)") ["data-on-click" "$$fn('foo', 123)"])
+(test (attributes/custom-validity "$foo === $bar ? '' : 'Fields must be the same.'")
+      ["data-custom-validity"
+       "$foo === $bar ? '' : 'Fields must be the same.'"])
+
+(test (attributes/on :click "$$fn('foo', 123)" :window "debounce.1s")
+      ["data-on-click__window__debounce.1s"
+       "$$fn('foo', 123)"])
+
+(test (attributes/persist) ["data-persist-datastar" :true])
+
+(test (attributes/replace-url "/hello/world") ["data-replace-url" "/hello/world"])
 
 (test (attributes/class {:text-primary "$primary" :font-bold "$bold"})
       ["data-class"
        "{\"font-bold\":\"$bold\",\"text-primary\":\"$primary\"}"])
 
-(test (attributes/fetch-indicator "#spinner") [:data-fetch-indicator "#spinner"])
+(test (attributes/attr {:disabled "$input == ''"})
+      ["data-attr"
+       "{\"disabled\":\"$input == ''\"}"])
 
-(test (attributes/header :x-csrf-token "TOKEN") ["data-header-x-csrf-token" "TOKEN"])
+(test (attributes/signals {:input 1 :form {:input 2}} :ifmissing)
+      ["data-signals__ifmissing"
+       "{\"form\":{\"input\":2},\"input\":1}"])
 
-(test (attributes/show "$showMe" "duration_100ms") ["data-show.duration_100ms" "$showMe"])
+(test (attributes/indicator :fetching) ["data-indicator" "$fetching"])
+
+(test (attributes/show "$showMe") ["data-show" "$showMe"])
 
 (test (attributes/intersects "console.log('Hi')" :once)
-      ["data-intersects.once"
+      ["data-intersects__once"
        "console.log('Hi')"])
 
-(test (attributes/teleport "#foo" :prepend) ["data-teleport.prepend" "#foo"])
-
 (test (attributes/scroll-into-view :instant :focus)
-      ["data-scroll-into-view.instant.focus"
+      ["data-scroll-into-view__instant__focus"
        :true])
 
 (test (attributes/view-transition :foo) ["data-view-transition" :foo])
+
+(test (attributes/ignore) [:data-star-ignore :true])

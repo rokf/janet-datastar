@@ -1,7 +1,24 @@
 (import spork/json)
 
-(defn store [obj & modifiers]
-  [(string/join [:data-store ;(map string modifiers)] ".") (string (json/encode obj))])
+# HELPERS
+
+(defn- encode-modifier [modifier]
+  (case (type modifier)
+    :tuple (string/join modifier ".")
+    :array (string/join modifier ".")
+    (string modifier)))
+
+(defn- encode-obj [obj]
+  (case (type obj)
+    :struct (string (json/encode obj))
+    :table (string (json/encode obj))
+    :string obj
+    "{}"))
+
+# CORE PLUGINS
+
+(defn signals [obj & modifiers]
+  [(string/join ["data-signals" ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
 (defn computed [key expr]
   [(string "data-computed-" key) expr])
@@ -9,39 +26,55 @@
 (defn ref [r]
   [:data-ref r])
 
-(defn bind [attr expr]
-  [(string "data-bind-" attr) expr])
+# DOM PLUGINS
 
-(defn model [signal-name]
-  ["data-model" signal-name])
+(defn attr [obj]
+  ["data-attr" (encode-obj obj)])
+
+(defn bind [signal]
+  ["data-bind" signal])
+
+(defn class [obj]
+  ["data-class" (encode-obj obj)])
+
+(defn on [event expr & modifiers]
+  [(string/join [(string "data-on-" event) ;(map encode-modifier modifiers)] "__") expr])
+
+(defn persist [&opt key val & modifiers]
+  (default key "datastar")
+  (default val :true)
+  [(string/join [(string "data-persist-" key) ;(map encode-modifier modifiers)] "__") val])
+
+(defn replace-url [expr]
+  ["data-replace-url" expr])
 
 (defn text [expr]
   ["data-text" expr])
 
-(defn on [event expr & modifiers]
-  [(string/join [(string :data-on- event) ;(map string modifiers)] ".") expr])
+# BROWSER PLUGINS
 
-(defn class [obj]
-  ["data-class" (string (json/encode obj))])
-
-(defn fetch-indicator [css-selector]
-  [:data-fetch-indicator css-selector])
-
-(defn header [name value]
-  [(string "data-header-" (string/ascii-lower name)) value])
-
-(defn show [expr & modifiers]
-  [(string/join [:data-show ;(map string modifiers)] ".") expr])
+(defn custom-validity [expr]
+  ["data-custom-validity" expr])
 
 (defn intersects [expr & modifiers]
-  [(string/join [:data-intersects ;(map string modifiers)] ".") expr])
+  [(string/join [:data-intersects ;(map encode-modifier modifiers)] "__") expr])
 
-(defn teleport [css-selector & modifiers]
-  [(string/join [:data-teleport ;(map string modifiers)] ".") css-selector])
-
-# @TODO will this work?
+# @TODO will :true work for boolean attributes?
 (defn scroll-into-view [& modifiers]
-  [(string/join [:data-scroll-into-view ;(map string modifiers)] ".") :true])
+  [(string/join ["data-scroll-into-view" ;(map encode-modifier modifiers)] "__") :true])
+
+(defn show [expr]
+  ["data-show" expr])
 
 (defn view-transition [name]
   ["data-view-transition" name])
+
+# BACKEND PLUGINS
+
+(defn indicator [sig]
+  ["data-indicator" (string "$" sig)])
+
+# IGNORING ELEMENTS
+
+(defn ignore []
+  [:data-star-ignore :true])

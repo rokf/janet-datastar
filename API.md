@@ -18,40 +18,37 @@ This document contains short descriptions of the building blocks of this library
 - put
 - patch
 - delete
-- is-fetching
 - set-all
 - toggle-all
-- clipboard
 - fit
-- fit-int
-- clamp-fit
-- clamp-fit-int
 
 ## `(use datastar/attributes)`
 
-- store
+- signals
 - computed
 - ref
+- attr
 - bind
-- model
-- text
-- on
 - class
-- fetch-indicator
-- header
-- show
+- on
+- persist
+- replace-url
+- text
+- custom-validity
 - intersects
-- teleport
 - scroll-into-view
+- show
 - view-transition
+- indicator
+- ignore
 
 ## `(use datastar/events)`
 
-- fragment
-- signal
-- delete
-- redirect
-- console
+- merge-fragments
+- merge-signals
+- remove-fragments
+- remove-signals
+- execute-script
 
 ## `(use datastar/server)`
 
