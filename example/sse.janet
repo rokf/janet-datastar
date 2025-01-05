@@ -3,6 +3,7 @@
 (import ./components)
 (import ./db)
 (import ../src :as datastar)
+(import ../src/attributes)
 
 (defn item-search [req redka-client]
   (def referer-header (get-in req [:headers "referer"]))
@@ -10,31 +11,24 @@
   (def items (db/items redka-client search-term))
   (def events @[])
   (if (= "" search-term)
-    (do (array/push events
-                    (events/merge-fragments
-                      (htmlgen/html components/default-header) :selector "#item-header-group" :mergeMode :outer)
-                    (events/merge-fragments
-                      (htmlgen/html [:div {:id :results} ;(components/item-list items)]) :selector "#results" :mergeMode :outer)))
+    (do
+      (array/push events
+                  (events/merge-fragments
+                    (htmlgen/html
+                      [:template components/default-header
+                       [:div (struct ;(attributes/replace-url "'/items'") :id "results") ;(components/item-list items)]]) :selector "#page-content" :mergeMode :inner)))
     (do
       (if (empty? items)
         (array/push events
                     (events/merge-fragments
-                      (htmlgen/html components/no-result-header)
-                      :selector "#item-header-group"
-                      :mergeMode :outer)
-                    (events/merge-fragments
-                      (htmlgen/html [:div])
-                      :selector "#results"
-                      :mergeMode :inner))
+                      (htmlgen/html
+                        [:template components/no-result-header
+                         [:div (struct ;(attributes/replace-url "'/items'") :id "results")]]) :selector "#page-content" :mergeMode :inner))
         (array/push events
                     (events/merge-fragments
-                      (htmlgen/html components/result-header)
-                      :selector "#item-header-group"
-                      :mergeMode :outer)
-                    (events/merge-fragments
-                      (htmlgen/html [:div {:id :results} ;(components/item-list items)])
-                      :selector "#results"
-                      :mergeMode :outer)))))
+                      (htmlgen/html
+                        [:template components/result-header
+                         [:div (struct ;(attributes/replace-url "'/items'") :id "results") ;(components/item-list items)]]) :selector "#page-content" :mergeMode :inner)))))
   {:headers datastar/headers
    :body events})
 

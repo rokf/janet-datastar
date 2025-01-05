@@ -15,15 +15,15 @@
      [:body (struct :class "container" ;(attributes/signals {:search ""}))
       [:header
        [:nav
-        [:ul [:li [:a {:href "/"} [:strong "office.shop"]]]]
+        [:ul [:li [:a {:href "/items"} [:strong "office.shop"]]]]
         [:ul [:li [:input
                    (struct
                      :type "search"
                      :placeholder "I'm looking for..."
                      ;(attributes/bind :search)
-                     ;(attributes/on :input (actions/post "/items") [:debounce "500ms"]))]]]
+                     ;(attributes/on :input (actions/get "/items") [:debounce "500ms"]))]]]
         [:ul
          [:li [:a {:href "/about"} "About"]]
          [:li [:a {:href "/cart"} "Cart (0)"]]]]]
-      [:main
+      [:main {:id "page-content"}
        ;content]]]))

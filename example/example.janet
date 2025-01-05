@@ -37,11 +37,14 @@
         (put ret :headers new-headers)
         ret))))
 
-(server (http/cookies (session-cookie-mw (datastar/middleware (fn [req]
-                                                                (pat/match (req-to-patt req)
-                                                                           {:route [""] :method "GET"} (pages/index req)
-                                                                           {:route ["about"] :method "GET"} (pages/about req)
-                                                                           {:route ["cart"] :method "GET"} (pages/cart req)
-                                                                           {:route ["items" id "add-to-cart"] :method "POST"} (sse/add-to-cart req id)
-                                                                           {:route ["items"] :method "POST"} (sse/item-search req redka-client)
-                                                                           _ {:status 404}))))))
+(server (http/cookies
+          (session-cookie-mw
+            (datastar/middleware
+              (fn [req]
+                (pat/match (req-to-patt req)
+                           {:route [""] :method "GET"} {:status 307 :headers {:location "/items"}}
+                           {:route ["about"] :method "GET"} (pages/about req)
+                           {:route ["cart"] :method "GET"} (pages/cart req)
+                           {:route ["items" id "add-to-cart"] :method "POST"} (sse/add-to-cart req id)
+                           {:route ["items"] :method "GET"} (pages/items req redka-client)
+                           _ {:status 404}))))))
