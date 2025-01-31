@@ -6,3 +6,6 @@ compose:
 
 decompose:
     docker-compose -f example/compose.yaml down
+
+test:
+    judge test -a

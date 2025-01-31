@@ -16,19 +16,19 @@
                   (events/merge-fragments
                     (htmlgen/html
                       [:template components/default-header
-                       [:div (struct ;(attributes/replace-url "'/items'") :id "results") ;(components/item-list items)]]) :selector "#page-content" :mergeMode :inner)))
+                       [:div (struct ;(attributes/replace-url "/items") :id "results") ;(components/item-list items)]]) :selector "#page-content" :mergeMode :inner)))
     (do
       (if (empty? items)
         (array/push events
                     (events/merge-fragments
                       (htmlgen/html
                         [:template components/no-result-header
-                         [:div (struct ;(attributes/replace-url "'/items'") :id "results")]]) :selector "#page-content" :mergeMode :inner))
+                         [:div (struct ;(attributes/replace-url "/items") :id "results")]]) :selector "#page-content" :mergeMode :inner))
         (array/push events
                     (events/merge-fragments
                       (htmlgen/html
                         [:template components/result-header
-                         [:div (struct ;(attributes/replace-url "'/items'") :id "results") ;(components/item-list items)]]) :selector "#page-content" :mergeMode :inner)))))
+                         [:div (struct ;(attributes/replace-url "/items") :id "results") ;(components/item-list items)]]) :selector "#page-content" :mergeMode :inner)))))
   {:headers datastar/headers
    :body events})
 

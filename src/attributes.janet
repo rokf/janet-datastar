@@ -40,13 +40,20 @@
 (defn on [event expr & modifiers]
   [(string/join [(string "data-on-" event) ;(map encode-modifier modifiers)] "__") expr])
 
+(defn- list-to-string [l]
+  (case (type l)
+    :tuple (string/join l " ")
+    :array (string/join l " ")
+    (string l)))
+
 (defn persist [&opt key val & modifiers]
   (default key "datastar")
   (default val "")
-  [(string/join [(string "data-persist-" key) ;(map encode-modifier modifiers)] "__") val])
+  [(string/join [(string "data-persist-" key) ;(map encode-modifier modifiers)] "__") (list-to-string val)])
 
+# @TODO might have to handle this differently for more complex expressions
 (defn replace-url [expr]
-  ["data-replace-url" expr])
+  ["data-replace-url" (string "`" expr "`")])
 
 (defn text [expr]
   ["data-text" expr])
@@ -75,5 +82,5 @@
 
 # IGNORING ELEMENTS
 
-(defn ignore []
-  [:data-star-ignore ""])
+(defn ignore [& modifiers]
+  [(string/join ["data-star-ignore" ;(map encode-modifier modifiers)] "__") ""])

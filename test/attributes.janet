@@ -21,8 +21,14 @@
        "$$fn('foo', 123)"])
 
 (test (attributes/persist) ["data-persist-datastar" ""])
+(test (attributes/persist nil "hello") ["data-persist-datastar" "hello"])
+(test (attributes/persist "hello" "world") ["data-persist-hello" "world"])
+(test (attributes/persist "hello" [:first "second"]) ["data-persist-hello" "first second"])
+(test (attributes/persist "hello" [:first "second"] :session)
+      ["data-persist-hello__session"
+       "first second"])
 
-(test (attributes/replace-url "/hello/world") ["data-replace-url" "/hello/world"])
+(test (attributes/replace-url "/hello/${world}") ["data-replace-url" "`/hello/${world}`"])
 
 (test (attributes/class {:text-primary "$primary" :font-bold "$bold"})
       ["data-class"
@@ -45,9 +51,9 @@
        "console.log('Hi')"])
 
 (test (attributes/scroll-into-view :instant :focus)
-  ["data-scroll-into-view__instant__focus"
-   ""])
+      ["data-scroll-into-view__instant__focus"
+       ""])
 
 (test (attributes/view-transition :foo) ["data-view-transition" :foo])
 
-(test (attributes/ignore) [:data-star-ignore ""])
+(test (attributes/ignore) ["data-star-ignore" ""])
