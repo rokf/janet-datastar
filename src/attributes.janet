@@ -1,13 +1,12 @@
 (import spork/json)
 
-# HELPERS
-
 (defn- encode-modifier [modifier]
   (case (type modifier)
     :tuple (string/join modifier ".")
     :array (string/join modifier ".")
     (string modifier)))
 
+# @TODO add support for Datastar expressions
 (defn- encode-obj [obj]
   (case (type obj)
     :struct (string (json/encode obj))
@@ -15,30 +14,88 @@
     :string obj
     "{}"))
 
-# CORE PLUGINS
-
 (defn signals [obj & modifiers]
   [(string/join ["data-signals" ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
-(defn computed [key expr]
-  [(string "data-computed-" key) expr])
+(defn ref [sig & modifiers]
+  [(string/join ["data-ref" ;(map encode-modifier modifiers)] "__") sig])
 
-(defn ref [r]
-  [:data-ref r])
-
-# DOM PLUGINS
+(defn style [obj]
+  ["data-style" (encode-obj obj)])
 
 (defn attr [obj]
   ["data-attr" (encode-obj obj)])
 
-(defn bind [signal]
-  ["data-bind" signal])
+(defn bind [sig & modifiers]
+  [(string/join ["data-bind" ;(map encode-modifier modifiers)] "__") sig])
 
-(defn class [obj]
-  ["data-class" (encode-obj obj)])
+(defn class [obj & modifiers]
+  [(string/join ["data-class" ;(map encode-modifier modifiers)] "__") obj])
 
 (defn on [event expr & modifiers]
   [(string/join [(string "data-on-" event) ;(map encode-modifier modifiers)] "__") expr])
+
+(defn computed [sig expr & modifiers]
+  [(string/join [(string "data-computed-" sig) ;(map encode-modifier modifiers)] "__") expr])
+
+(defn text [expr]
+  ["data-text" expr])
+
+(defn effect [expr]
+  ["data-effect" expr])
+
+(defn on-intersect [expr & modifiers]
+  [(string/join ["data-on-intersect" ;(map encode-modifier modifiers)] "__") expr])
+
+(defn on-interval [expr & modifiers]
+  [(string/join ["data-on-interval" ;(map encode-modifier modifiers)] "__") expr])
+
+(defn on-load [expr & modifiers]
+  [(string/join ["data-on-load" ;(map encode-modifier modifiers)] "__") expr])
+
+(defn on-signal-patch [expr & modifiers]
+  [(string/join ["data-on-signal-patch" ;(map encode-modifier modifiers)] "__") expr])
+
+(defn on-signal-patch-filter [obj]
+  ["data-on-signal-patch-filter" (encode-obj obj)])
+
+(defn preserve-attr [attributes]
+  ["data-preserve-attr" (string/join attributes " ")])
+
+(defn show [expr]
+  ["data-show" expr])
+
+(defn indicator [sig & modifiers]
+  [(string/join ["data-indicator" ;(map encode-modifier modifiers)] "__") sig])
+
+(defn ignore [& modifiers]
+  [(string/join ["data-ignore" ;(map encode-modifier modifiers)] "__") ""])
+
+(defn ignore-morph []
+  ["data-ignore-morph" ""])
+
+(defn json-signals [obj & modifiers]
+  [(string/join ["data-json-signals" ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
+
+# PRO attributes
+
+(defn animate []
+  ["data-animate"])
+
+(defn custom-validity [expr]
+  ["data-custom-validity" expr])
+
+(defn on-raf [expr & modifiers]
+  [(string/join ["data-on-raf" ;(map encode-modifier modifiers)] "__") expr])
+
+(defn on-resize [expr & modifiers]
+  [(string/join ["data-on-raf" ;(map encode-modifier modifiers)] "__") expr])
+
+(defn replace-url [expr]
+  ["data-replace-url" (string "`" expr "`")])
+
+(defn scroll-into-view [& modifiers]
+  [(string/join ["data-scroll-into-view" ;(map encode-modifier modifiers)] "__") ""])
 
 (defn- list-to-string [l]
   (case (type l)
@@ -46,41 +103,15 @@
     :array (string/join l " ")
     (string l)))
 
-(defn persist [&opt key val & modifiers]
+(defn persist [&opt key obj & modifiers]
   (default key "datastar")
-  (default val "")
-  [(string/join [(string "data-persist-" key) ;(map encode-modifier modifiers)] "__") (list-to-string val)])
+  (default obj "")
+  [(string/join [(string "data-persist-" key) ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
-# @TODO might have to handle this differently for more complex expressions
-(defn replace-url [expr]
-  ["data-replace-url" (string "`" expr "`")])
 
-(defn text [expr]
-  ["data-text" expr])
+(defn query-string [&opt obj & modifiers]
+  (default obj "")
+  [(string/join ["data-query-string" ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
-# BROWSER PLUGINS
-
-(defn custom-validity [expr]
-  ["data-custom-validity" expr])
-
-(defn intersects [expr & modifiers]
-  [(string/join [:data-intersects ;(map encode-modifier modifiers)] "__") expr])
-
-(defn scroll-into-view [& modifiers]
-  [(string/join ["data-scroll-into-view" ;(map encode-modifier modifiers)] "__") ""])
-
-(defn show [expr]
-  ["data-show" expr])
-
-(defn view-transition [name]
-  ["data-view-transition" name])
-
-# BACKEND PLUGINS
-
-(defn indicator [sig]
-  ["data-indicator" (string "$" sig)])
-
-# IGNORING ELEMENTS
-
-(defn ignore [& modifiers]
-  [(string/join ["data-star-ignore" ;(map encode-modifier modifiers)] "__") ""])
+(defn view-transition [expr]
+  ["data-view-transition" expr])
