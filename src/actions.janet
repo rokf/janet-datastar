@@ -1,16 +1,11 @@
 (import spork/json)
 
-# HELPERS
-
 (defn- encode-obj [obj]
   (case (type obj)
     :struct (string (json/encode obj))
     :table (string (json/encode obj))
     :string obj
     "{}"))
-
-
-# BACKEND PLUGINS
 
 (defmacro- make-request-action [method]
   ~(def ,method (fn [url &opt options]
@@ -27,13 +22,16 @@
 
 (make-request-action delete)
 
-# LOGIC PLUGINS
+(defn peek [sig]
+  (string/format "@peek(() => $%s)" sig))
 
 (defn set-all [regexp val]
   (string/format "@setAll('%s', %s)" regexp val))
 
 (defn toggle-all [regexp]
   (string/format "@toggleAll('%s')" regexp))
+
+# PRO actions
 
 (defn fit [v old-min old-max new-min new-max &opt should-clamp should-round]
   (default should-clamp false)

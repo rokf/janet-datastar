@@ -6,7 +6,6 @@
     :array (string/join modifier ".")
     (string modifier)))
 
-# @TODO add support for Datastar expressions
 (defn- encode-obj [obj]
   (case (type obj)
     :struct (string (json/encode obj))
@@ -23,20 +22,20 @@
 (defn style [obj]
   ["data-style" (encode-obj obj)])
 
-(defn attr [obj]
-  ["data-attr" (encode-obj obj)])
+(defn attr [obj &opt a]
+  [(string "data-attr" (if a (string ":" a))) (encode-obj obj)])
 
 (defn bind [sig & modifiers]
   [(string/join ["data-bind" ;(map encode-modifier modifiers)] "__") sig])
 
-(defn class [obj & modifiers]
-  [(string/join ["data-class" ;(map encode-modifier modifiers)] "__") obj])
+(defn class [obj &opt c & modifiers]
+  [(string/join [(string "data-class" (if c (string ":" c))) ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
 (defn on [event expr & modifiers]
-  [(string/join [(string "data-on-" event) ;(map encode-modifier modifiers)] "__") expr])
+  [(string/join [(string "data-on:" event) ;(map encode-modifier modifiers)] "__") expr])
 
-(defn computed [sig expr & modifiers]
-  [(string/join [(string "data-computed-" sig) ;(map encode-modifier modifiers)] "__") expr])
+(defn computed [obj &opt s & modifiers]
+  [(string/join [(string "data-computed" (if s (string ":" s))) ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
 (defn text [expr]
   ["data-text" expr])
@@ -50,8 +49,8 @@
 (defn on-interval [expr & modifiers]
   [(string/join ["data-on-interval" ;(map encode-modifier modifiers)] "__") expr])
 
-(defn on-load [expr & modifiers]
-  [(string/join ["data-on-load" ;(map encode-modifier modifiers)] "__") expr])
+(defn init [expr & modifiers]
+  [(string/join ["data-init" ;(map encode-modifier modifiers)] "__") expr])
 
 (defn on-signal-patch [expr & modifiers]
   [(string/join ["data-on-signal-patch" ;(map encode-modifier modifiers)] "__") expr])
@@ -74,7 +73,9 @@
 (defn ignore-morph []
   ["data-ignore-morph" ""])
 
-(defn json-signals [obj & modifiers]
+
+(defn json-signals [&opt obj & modifiers]
+  (default obj "")
   [(string/join ["data-json-signals" ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
 # PRO attributes
