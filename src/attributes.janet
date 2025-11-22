@@ -13,14 +13,14 @@
     :string obj
     "{}"))
 
-(defn signals [obj & modifiers]
-  [(string/join ["data-signals" ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
+(defn signals [obj &opt s & modifiers]
+  [(string/join [(string "data-signals" (if s (string ":" s))) ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
 (defn ref [sig & modifiers]
   [(string/join ["data-ref" ;(map encode-modifier modifiers)] "__") sig])
 
-(defn style [obj]
-  ["data-style" (encode-obj obj)])
+(defn style [obj &opt s]
+  [(string "data-style" (if s (string ":" s))) (encode-obj obj)])
 
 (defn attr [obj &opt a]
   [(string "data-attr" (if a (string ":" a))) (encode-obj obj)])
@@ -58,7 +58,7 @@
 (defn on-signal-patch-filter [obj]
   ["data-on-signal-patch-filter" (encode-obj obj)])
 
-(defn preserve-attr [attributes]
+(defn preserve-attr [& attributes]
   ["data-preserve-attr" (string/join attributes " ")])
 
 (defn show [expr]

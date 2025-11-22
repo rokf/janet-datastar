@@ -12,7 +12,7 @@
 
 (test (attributes/effect "hello") ["data-effect" "hello"])
 
-(test (attributes/ref "foo") ["data-ref" "foo"])
+(test (attributes/ref "foo" [:case :camel]) ["data-ref__case.camel" "foo"])
 
 (test (attributes/bind "foo") ["data-bind" "foo"])
 
@@ -52,9 +52,11 @@
 
   (test (attributes/attr "$foo" :title) ["data-attr:title" "$foo"]))
 
-(test (attributes/signals {:input 1 :form {:input 2}} :ifmissing)
+(test (attributes/signals {:input 1 :form {:input 2}} nil :ifmissing)
       ["data-signals__ifmissing"
        "{\"form\":{\"input\":2},\"input\":1}"])
+(test (attributes/signals "1" "foo.bar") ["data-signals:foo.bar" "1"])
+(test (attributes/signals {:foo :null}) ["data-signals" "{\"foo\":null}"])
 
 (test (attributes/indicator :fetching) ["data-indicator" :fetching])
 (test (attributes/indicator :fetching [:case :camel]) ["data-indicator__case.camel" :fetching])
@@ -98,3 +100,12 @@
 (test (attributes/on-signal-patch-filter "{include: /user/, exclude: /password/}")
       ["data-on-signal-patch-filter"
        "{include: /user/, exclude: /password/}"])
+
+(test (attributes/preserve-attr :open :class) ["data-preserve-attr" "open class"])
+
+(test (attributes/style {:display :none :color :red})
+      ["data-style"
+       "{\"color\":\"red\",\"display\":\"none\"}"])
+(test (attributes/style "$usingRed ? 'red' : 'blue'" :background-color)
+      ["data-style:background-color"
+       "$usingRed ? 'red' : 'blue'"])
