@@ -8,19 +8,9 @@
 (import ../src/actions)
 (import ../src/events)
 
-# WARNING
-#
-# The example is currently broken. I'll come up with
-# something new and probably simpler, without permanent
-# storage and such. Refer to the tests for now.
-
 (use module)
 
-(def state {:items [{:name "Pencil"} {:name "Eraser"} {:name "Ruler"}]
-            :users [{:name "Admin"} {:name "Rok"}]
-            :sessions []
-            :carts []
-            :orders []})
+(def- events @[{:title "A" :created-at (os/time)}])
 
 (defmodule- components
   (defn heading [summary & breadcrumbs]
@@ -28,16 +18,7 @@
      [:h2
       [:nav {:aria-label "breadcrumb" :style "--pico-nav-breadcrumb-divider: '|';"}
        [:ul ;(map (fn [x] [:li (case (type x) :struct [:a {:href (get x :href)} (get x :txt)] (string x))]) breadcrumbs)]]] [:p summary]])
-  (defn article [& content] [:article ;content])
-  (defn catalogue [items]
-    [:div {:class "row-fluid"}
-     [:article {:class "col-12 col-md-4"}
-      [:fieldset
-       [:label "Filter by" [:select [:option "Name"]]]
-       [:label "Filter" [:input {:type "text" :placeholder "Filter"}]]
-       [:label "Order by" [:select [:option "Name"]]]]]
-     [:div {:class "col-12 col-md-8"}
-      ;(map (fn [i] [:article (get i :name)]) items)]]))
+  (defn article [& content] [:article ;content]))
 
 (defn primary-layout [& content]
   (htmlgen/html
@@ -46,16 +27,15 @@
       [:meta {:charset "utf-8"}]
       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
       [:meta {:name "color-scheme" :content "light dark"}]
-      [:link {:rel "stylesheet" :href "https://cdn.jsdelivr.net/npm/@yohns/picocss@2.2.9/css/pico.azure.min.css"}]
-      [:script {:type "module" :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.11/bundles/datastar.js"}]
-      [:title "Office Shop"]]
-     [:body (struct :class "container" ;(attributes/signals {:search ""}))
+      [:link {:rel "stylesheet" :href "https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"}]
+      [:script {:type "module" :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js"}]
+      [:title "Example"]]
+     [:body {:class "container"}
       [:header
        [:nav
-        [:ul [:li [:a {:href "/items"} [:strong "Office Shop"]]]]
+        [:ul [:li [:a {:href "/"} [:strong "Example"]]]]
         [:ul
-         [:li [:a {:href "/about"} "About"]]
-         [:li [:a {:href "/auth/sign-in" :role "button"} "Sign in"]]]]]
+         [:li [:a {:href "/events"} "Events"]]]]]
       [:main
        ;content]]]))
 
@@ -63,10 +43,13 @@
   {:route (string/split "/" (string/triml (get req :route) "/"))
    :method (get req :method)})
 
-(defmodule- handlers
-  (defn items []
-    {:status 200 :body (primary-layout (components/heading "Below you can find the items that we currently have in stock." "Items") (components/catalogue (get state :items)))})
-  (defn item [id] {:status 200 :body (primary-layout (components/heading "Below you can find the items that we currently have in stock." {:href "/items" :txt "Items"} id) (components/article))}))
+(defn- event-table [events]
+  [:tbody {:id "event-table"}
+   ;(map (fn [e]
+           [:tr
+            [:td (get e :title)]
+            [:td (get e :created-at)]
+            [:td [:button {:class "secondary"} "x"]]]) events)])
 
 (server
   (http/cookies
@@ -74,11 +57,18 @@
       (fn [req]
         (pat/match
           (req-to-patt req)
-          {:route [""] :method "GET"} {:status 307 :headers {:location "/items"}}
-          {:route ["items"] :method "GET"} (handlers/items)
-          {:route ["items" id] :method "GET"} (handlers/item id)
+          {:route [""] :method "GET"} {:status 307 :headers {:location "/events"}}
+          {:route ["event-stream"] :method "GET"} (let
+                                                    [c (ev/chan 3)]
+                                                    (ev/spawn
+                                                      (forever
+                                                        (ev/give c (events/patch-elements (htmlgen/html (event-table events))))
+                                                        (ev/sleep 1)
+                                                        (array/push events {:title "X" :created-at (os/time)})))
 
-          {:route ["about"] :method "GET"} {:status 200 :body (primary-layout (components/heading "Hello" "About") (components/article "Hello"))}
-          {:route ["auth" "sign-in"] :method "GET"} {:status 200 :body (primary-layout (components/heading "Provide your credentials to sign in to your account." "Sign in") (components/article))}
+                                                    {:status 200 :body c})
+          {:route ["events"] :method "GET"} {:status 200 :body (primary-layout
+                                                                 (components/heading "See events as they happen." "Events")
+                                                                 (components/article [:table (struct ;(attributes/init (actions/get "/event-stream"))) [:thead [:tr [:th "Title"] [:th "Created at"] [:th "Actions"]]] (event-table events)]))}
 
           _ {:status 404})))))

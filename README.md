@@ -37,6 +37,7 @@ An example can be found in the `example` folder. It requires the following depen
 
 - https://github.com/ianthehenry/pat
 - https://github.com/janet-lang/spork
+- https://github.com/ianthehenry/janet-module
 
 ## Tests
 
