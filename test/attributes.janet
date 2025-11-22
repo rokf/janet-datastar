@@ -18,22 +18,9 @@
 
 (test (attributes/text "$foo") ["data-text" "$foo"])
 
-(test (attributes/custom-validity "$foo === $bar ? '' : 'Fields must be the same.'")
-      ["data-custom-validity"
-       "$foo === $bar ? '' : 'Fields must be the same.'"])
-
 (test (attributes/on :click "$foo = evt.detail" :window "debounce.1s")
       ["data-on:click__window__debounce.1s"
        "$foo = evt.detail"])
-
-(test (attributes/persist) ["data-persist-datastar" ""])
-(test (attributes/persist nil "hello") ["data-persist-datastar" "hello"])
-(test (attributes/persist "hello" "world") ["data-persist-hello" "world"])
-(test (attributes/persist "hello" [:first "second"]) ["data-persist-hello" "{}"])
-(test (attributes/persist "hello" [:first "second"] :session)
-      ["data-persist-hello__session" "{}"])
-
-(test (attributes/replace-url "/hello/${world}") ["data-replace-url" "`/hello/${world}`"])
 
 (deftest class
   (test (attributes/class {:text-primary "$primary" :font-bold "$bold"})
@@ -66,12 +53,6 @@
 (test (attributes/on-intersect "console.log('Hi')" :once)
       ["data-on-intersect__once"
        "console.log('Hi')"])
-
-(test (attributes/scroll-into-view :instant :focus)
-      ["data-scroll-into-view__instant__focus"
-       ""])
-
-(test (attributes/view-transition :foo) ["data-view-transition" :foo])
 
 (test (attributes/ignore) ["data-ignore" ""])
 (test (attributes/ignore :self) ["data-ignore__self" ""])
@@ -109,3 +90,53 @@
 (test (attributes/style "$usingRed ? 'red' : 'blue'" :background-color)
       ["data-style:background-color"
        "$usingRed ? 'red' : 'blue'"])
+
+# PRO
+
+(test (attributes/animate) ["data-animate"])
+
+(test (attributes/custom-validity "$foo === $bar ? '' : 'Values must be the same.'")
+      ["data-custom-validity"
+       "$foo === $bar ? '' : 'Values must be the same.'"])
+
+(test (attributes/custom-validity "$foo === $bar ? '' : 'Fields must be the same.'")
+      ["data-custom-validity"
+       "$foo === $bar ? '' : 'Fields must be the same.'"])
+
+(test (attributes/on-raf "$count++" [:throttle "1s" :trailing])
+      ["data-on-raf__throttle.1s.trailing"
+       "$count++"])
+
+
+(test (attributes/on-resize "$count++" [:throttle "1s" :trailing])
+      ["data-on-resize__throttle.1s.trailing"
+       "$count++"])
+
+(test (map |(apply attributes/persist ;$&)
+           [[]
+            ["{include: /foo/, exclude: /bar/}"]
+            [nil :mykey]
+            [nil :mykey :session]])
+      @[["data-persist:datastar" ""]
+        ["data-persist:datastar"
+         "{include: /foo/, exclude: /bar/}"]
+        ["data-persist:mykey" ""]
+        ["data-persist:mykey__session" ""]])
+
+(test (map |(apply attributes/query-string ;$&)
+           [[]
+            ["{include: /foo/, exclude: /bar/}"]
+            [nil :filter :history]])
+      @[["data-query-string" ""]
+        ["data-query-string"
+         "{include: /foo/, exclude: /bar/}"]
+        ["data-query-string__filter__history"
+         ""]])
+
+(test (attributes/replace-url "/page${page}") ["data-replace-url" "`/page${page}`"])
+
+(test (attributes/scroll-into-view :instant :focus)
+      ["data-scroll-into-view__instant__focus"
+       ""])
+
+(test (attributes/view-transition :foo) ["data-view-transition" "foo"])
