@@ -8,6 +8,12 @@
 (import ../src/actions)
 (import ../src/events)
 
+# WARNING
+#
+# The example is currently broken. I'll come up with
+# something new and probably simpler, without permanent
+# storage and such. Refer to the tests for now.
+
 (use module)
 
 (def state {:items [{:name "Pencil"} {:name "Eraser"} {:name "Ruler"}]
