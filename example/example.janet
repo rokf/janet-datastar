@@ -3,7 +3,6 @@
 (import spork/htmlgen)
 
 (import ../src :as datastar)
-(use ../src/server)
 (import ../src/attributes)
 (import ../src/actions)
 (import ../src/events)
@@ -51,7 +50,7 @@
             [:td (get e :created-at)]
             [:td [:button {:class "secondary"} "x"]]]) events)])
 
-(server
+(http/server
   (http/cookies
     (datastar/middleware
       (fn [req]
@@ -59,14 +58,13 @@
           (req-to-patt req)
           {:route [""] :method "GET"} {:status 307 :headers {:location "/events"}}
           {:route ["event-stream"] :method "GET"} (let
-                                                    [c (ev/chan 3)]
-                                                    (ev/spawn
-                                                      (forever
-                                                        (ev/give c (events/patch-elements (htmlgen/html (event-table events))))
-                                                        (ev/sleep 1)
-                                                        (array/push events {:title "X" :created-at (os/time)})))
-
-                                                    {:status 200 :body c})
+                                                    [c (get req :connection)]
+                                                    (http/send-response c {:headers datastar/headers})
+                                                    (for i 0 10
+                                                      (ev/sleep 1)
+                                                      (http/send-response c {:body (events/patch-elements (htmlgen/html (event-table events)))})
+                                                      (array/push events {:title "X" :created-at (os/time)}))
+                                                    {:status 204})
           {:route ["events"] :method "GET"} {:status 200 :body (primary-layout
                                                                  (components/heading "See events as they happen." "Events")
                                                                  (components/article [:table (struct ;(attributes/init (actions/get "/event-stream"))) [:thead [:tr [:th "Title"] [:th "Created at"] [:th "Actions"]]] (event-table events)]))}

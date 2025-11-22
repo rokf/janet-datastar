@@ -16,7 +16,6 @@ The library is split into multiple modules:
 - `datastar/attributes` contains helper functions for Datastar's HTML attributes, such as `data-on`.
 - `datastar/actions` contains helper functions for Datastar's actions, such as `@get()`.
 - `datastar/events` contains helper functions for all the SSE response types (events) Datastar is supporting.
-- `datastar/server` contains a slightly customized HTTP server implementation from `spork/http`, because the original does not (yet) support everything that'd be needed for it to work well with the Datastar framework.
 
 ## Installation
 
