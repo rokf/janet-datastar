@@ -90,7 +90,7 @@
   [(string/join ["data-on-raf" ;(map encode-modifier modifiers)] "__") expr])
 
 (defn on-resize [expr & modifiers]
-  [(string/join ["data-on-raf" ;(map encode-modifier modifiers)] "__") expr])
+  [(string/join ["data-on-resize" ;(map encode-modifier modifiers)] "__") expr])
 
 (defn replace-url [expr]
   ["data-replace-url" (string "`" expr "`")])
@@ -104,10 +104,10 @@
     :array (string/join l " ")
     (string l)))
 
-(defn persist [&opt key obj & modifiers]
+(defn persist [&opt obj key & modifiers]
   (default key "datastar")
   (default obj "")
-  [(string/join [(string "data-persist-" key) ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
+  [(string/join [(string "data-persist:" key) ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
 
 (defn query-string [&opt obj & modifiers]
@@ -115,4 +115,7 @@
   [(string/join ["data-query-string" ;(map encode-modifier modifiers)] "__") (encode-obj obj)])
 
 (defn view-transition [expr]
-  ["data-view-transition" expr])
+  ["data-view-transition" (string expr)])
+
+# Rocket - @TODO
+
