@@ -25,13 +25,18 @@
 (defn peek [sig]
   (string/format "@peek(() => $%s)" sig))
 
-(defn set-all [regexp val]
-  (string/format "@setAll('%s', %s)" regexp val))
+(defn set-all [val fil]
+  (string/format "@setAll('%s', %s)" val fil))
 
-(defn toggle-all [regexp]
-  (string/format "@toggleAll('%s')" regexp))
+(defn toggle-all [fil]
+  (string/format "@toggleAll('%s')" fil))
 
 # PRO actions
+
+(defn clipboard [t &opt b64]
+  (default b64 false)
+  (string/format "@clipboard('%s', %V)" t b64))
+
 
 (defn fit [v old-min old-max new-min new-max &opt should-clamp should-round]
   (default should-clamp false)
