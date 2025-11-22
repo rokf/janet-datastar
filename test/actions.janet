@@ -2,6 +2,8 @@
 
 (import ../src/actions)
 
+(test (actions/peek :bar) "@peek(() => $bar)")
+
 (test (actions/get "/users/1") "@get('/users/1', {})")
 
 (test (actions/post "/users") "@post('/users', {})")
@@ -16,4 +18,9 @@
 
 (test (actions/toggle-all "contact_") "@toggleAll('contact_')")
 
+# PRO
+
 (test (actions/fit 1 2 3 4 5) "@fit(1, 2, 3, 4, 5, false, false)")
+
+(test (actions/clipboard "Hello, world!") "@clipboard('Hello, world!', false)")
+(test (actions/clipboard "SGVsbG8sIHdvcmxkIQ==" :true) "@clipboard('SGVsbG8sIHdvcmxkIQ==', true)")
