@@ -28,6 +28,11 @@ The library can be installed with **jpm** using `jpm install https://github.com/
 
 ## Example
 
+> [!WARNING]
+>
+> The example is currently broken and being reworked. Please refer to tests
+> for the time being.
+
 An example can be found in the `example` folder. It requires the following dependencies:
 
 - https://github.com/ianthehenry/pat
