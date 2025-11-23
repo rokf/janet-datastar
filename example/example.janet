@@ -62,7 +62,7 @@
                                                     (http/send-response c {:headers datastar/headers})
                                                     (for i 0 10
                                                       (ev/sleep 1)
-                                                      (http/send-response c {:body (events/patch-elements (htmlgen/html (event-table events)))})
+                                                      (ev/write c (events/patch-elements (htmlgen/html (event-table events))))
                                                       (array/push events {:title "X" :created-at (os/time)}))
                                                     {:status 204})
           {:route ["events"] :method "GET"} {:status 200 :body (primary-layout
