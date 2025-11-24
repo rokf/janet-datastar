@@ -16,7 +16,7 @@ The library is split into multiple modules:
 - `datastar/attributes` contains helper functions for Datastar's HTML attributes, such as `data-on`.
 - `datastar/actions` contains helper functions for Datastar's actions, such as `@get()`.
 - `datastar/events` contains helper functions for all the SSE response types (events) Datastar is supporting.
-- `datastar/rocket` contains helpers for the [Rocket](https://data-star.dev/reference/rocket#esm-imports) component plugin.
+- `datastar/rocket` contains helpers for the [Rocket](https://data-star.dev/reference/rocket) component plugin.
 
 ## Installation
 
