@@ -116,6 +116,3 @@
 
 (defn view-transition [expr]
   ["data-view-transition" (string expr)])
-
-# Rocket - @TODO
-

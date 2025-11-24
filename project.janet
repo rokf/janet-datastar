@@ -12,4 +12,5 @@
   :source ["src/init.janet"
            "src/attributes.janet"
            "src/actions.janet"
-           "src/events.janet"])
+           "src/events.janet"
+           "src/rocket.janet"])
